@@ -93,8 +93,13 @@
       });
     });
   }
+  function cdnPath(rel) {
+    return "https://cdn.jsdelivr.net/gh/shaochiyidian8/huanxi-menu-site@main/" + rel;
+  }
   function applyMedia(k) {
-    var src = state.mediaURLs[k] || (k === "brandVideo" ? "assets/video/store.mp4?v=3" : "assets/parking/parking.mp4?v=3");
+    var rel = k === "brandVideo" ? "assets/video/store.mp4" : "assets/parking/parking.mp4";
+    var src = state.mediaURLs[k] || cdnPath(rel + "?v=4");
+    var localSrc = rel + "?v=4";
     if (k === "brandVideo") {
       var hv = $("heroBgVideo");
       hv.muted = true; hv.setAttribute("playsinline", ""); hv.setAttribute("muted", "");
@@ -103,6 +108,8 @@
       hv.addEventListener("canplay", function () { tryHeroPlay(hv); });
       var bp = $("svBrandPreview"); if (bp) bp.src = src;
     } else {
+      var pv = $("parkingVideo");
+      pv.onerror = function () { if (!pv.dataset.fb) { pv.dataset.fb = 1; pv.src = localSrc; } };
       $("parkingVideo").src = src;
       var pp = $("svParkPreview"); if (pp) pp.src = src;
     }
@@ -221,8 +228,6 @@
     if (notice) $("noticeBar").textContent = "公告：" + notice;
 
     var ex = D.store.extras || {};
-    var pv = $("parkingVideo");
-    pv.src = ex.parkingVideo || "";
     $("parkingSteps").innerHTML = (ex.parkingSteps || []).map(function (s) { return "<li>" + s + "</li>"; }).join("");
 
     function gallery(el, list, label) {
