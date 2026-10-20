@@ -3,6 +3,11 @@
   "use strict";
   var D = window.HUANXI_DATA;
   var $ = function (id) { return document.getElementById(id); };
+  function esc(v) {
+    return String(v == null ? "" : v).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+    });
+  }
 
   /* ---------- 持久化 ---------- */
   var store = {
@@ -10,7 +15,15 @@
       try { var v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); }
       catch (e) { return def; }
     },
-    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    set: function (k, v) {
+      try { localStorage.setItem(k, JSON.stringify(v)); }
+      catch (e) {
+        if (!state._quotaAlerted && /quota/i.test(String(e))) {
+          state._quotaAlerted = true;
+          alert("本机存储空间已满(图片视频上传过多),部分新改动可能未保存。请清理后重试,或联系技术支持。");
+        }
+      }
+    }
   };
 
   var state = {
@@ -29,7 +42,8 @@
     viewerIdx: 0,
     view: "home",
     table: null,
-    unlocked: false
+    unlocked: false,
+    search: ""
   };
   function saveCart() { store.set("hx_cart", state.cart); }
 
@@ -378,7 +392,7 @@
         var q = specQty(d, sp.unit);
         return '<span class="stepper"><i class="u">' + sp.unit + '</i>' +
           (q > 0 ? '<button data-keydec="' + cartKey(d, sp.unit) + '">−</button><b>' + q + '</b>' : "") +
-          '<button data-keyinc="' + cartKey(d, sp.unit) + '" title="' + sp.unit + ' ¥' + sp.price + '"' + (soldout ? " disabled" : "") + ">+</button></span>";
+          '<button aria-label="加一份' + sp.unit + '" data-keyinc="' + cartKey(d, sp.unit) + '" title="' + sp.unit + ' ¥' + sp.price + '"' + (soldout ? " disabled" : "") + ">+</button></span>";
       }).join("");
     }
     var q = dishQty(d);
@@ -399,7 +413,7 @@
         return '<button data-addkey="' + cartKey(d, s.unit) + '"' + (soldout ? " disabled" : "") + ">" + s.unit + " ¥" + s.price + "</button>";
       }).join("") + "</div>";
     }
-    return '<button class="qty-add" data-addkey="' + cartKey(d, d.unit) + '"' + (soldout ? " disabled" : "") + ">+</button>";
+    return '<button class="qty-add" aria-label="加一份" data-addkey="' + cartKey(d, d.unit) + '"' + (soldout ? " disabled" : "") + ">+</button>";
   }
   function priceHtml(d) {
     var specs = specList(d);
@@ -479,12 +493,14 @@
       : '<div class="thumb-ph" style="--h:' + hueOf(d.id) + '">' + d.name.charAt(0) + "</div>";
     var mark = d.uncertain && state.mode === "staff" ? ' <span class="uncertain-mark">?</span>' : "";
     var orig = "";
+    var nm = esc(d.name);
+    var ing = esc(d.ingredients || "");
     return '<div class="mline' + (soldout ? " soldout" : "") + '" data-id="' + d.id + '">' +
       '<div class="mthumb" data-thumb="' + d.id + '">' + inner + (m.video ? '<span class="play-badge">▶</span>' : "") + "</div>" +
       '<div class="mmain">' +
-      '<div class="mrow1"><span class="mname" title="' + d.name + '">' + d.name + mark + " " + orig + '</span><span class="dots"></span>' +
+      '<div class="mrow1"><span class="mname" title="' + nm + '">' + nm + mark + " " + orig + '</span><span class="dots"></span>' +
       '<span class="mprice">' + priceHtml(d) + "</span></div>" +
-      '<div class="mrow2">' + badgesHtml(d, true) + (d.ingredients ? '<span class="ming">' + d.ingredients + "</span>" : "") +
+      '<div class="mrow2">' + badgesHtml(d, true) + (ing ? '<span class="ming">' + ing + "</span>" : "") +
       '<span class="madds">' + stepperHtml(d) + "</span></div>" +
       "</div></div>";
   }
@@ -529,7 +545,11 @@
     var cats = state.cat === "all" ? catsOfGroup(state.group) : CATS.filter(function (c) { return c.id === state.cat; });
     var htmls = [], preorderShown = false, n = 0;
     cats.forEach(function (c) {
-      var list = DISHES.filter(function (d) { return d.category === c.id && inBand(d.price, state.band); });
+      var q = state.search.trim();
+      var list = DISHES.filter(function (d) {
+        return d.category === c.id && inBand(d.price, state.band) &&
+          (!q || d.name.indexOf(q) >= 0 || (d.ingredients || "").indexOf(q) >= 0);
+      });
       if (!list.length) return;
       if (c.name === "预定菜品") preorderShown = true;
       n += 1;
@@ -936,10 +956,15 @@
       if (!state.table) { ensureTable(false, doAdd); } else { doAdd(); }
     });
     $("cartBar").addEventListener("click", function () {
-      $("cartDrawer").hidden = false; $("drawerMask").hidden = false; renderCartDrawer();
+      $("cartDrawer").hidden = false; $("drawerMask").hidden = false;
+      document.body.style.overflow = "hidden";
+      renderCartDrawer(); renderPayPick();
     });
     $("drawerMask").addEventListener("click", closeDrawer);
-    function closeDrawer() { $("cartDrawer").hidden = true; $("drawerMask").hidden = true; renderCartBar(); }
+    function closeDrawer() {
+      $("cartDrawer").hidden = true; $("drawerMask").hidden = true;
+      document.body.style.overflow = ""; renderCartBar();
+    }
     $("cartDrawer").addEventListener("click", function (e) {
       var inc = e.target.closest("[data-inc]"), dec = e.target.closest("[data-dec]");
       if (inc) state.cart[inc.dataset.inc]++;
@@ -950,6 +975,9 @@
     $("orderSubmit").addEventListener("click", function () {
       var es = cartEntries();
       if (!es.length) return;
+      if (state._submitting) return;
+      state._submitting = true;
+      var subBtn = this; subBtn.disabled = true;
       var seq = store.get("hx_order_seq", 100) + 1;
       store.set("hx_order_seq", seq);
       var now = new Date();
@@ -975,6 +1003,7 @@
         (needQr ? '<button class="tbtn solid" id="goPayQr">扫码支付(' + o.payMethod + ")</button>" : "") +
         '<button class="tbtn ghost" id="orderDoneBtn">完成</button></div>';
       state.lastOrderId = o.id;
+      setTimeout(function () { state._submitting = false; subBtn.disabled = false; }, 1200);
       var gq = $("goPayQr");
       if (gq) gq.addEventListener("click", function () {
         $("payQrImg").src = cfg[o.payMethod === "微信支付" ? "wxImg" : "aliImg"];
@@ -1352,6 +1381,15 @@
         if (e.key === "ArrowRight") stepViewer(1);
       }
     });
+    $("menuSearch").addEventListener("input", function () {
+      state.search = this.value;
+      $("menuSearchClear").hidden = !this.value;
+      renderDishes();
+    });
+    $("menuSearchClear").addEventListener("click", function () {
+      $("menuSearch").value = ""; state.search = "";
+      $("menuSearchClear").hidden = true; renderDishes();
+    });
     $("filterToggle") && $("filterToggle").addEventListener("click", function () {
       $("filterBar").classList.toggle("open");
     });
@@ -1363,6 +1401,8 @@
     var lastY = 0;
     window.addEventListener("scroll", function () {
       var y = window.pageYOffset || 0;
+      var bt = $("backTop");
+      if (bt) bt.hidden = y < 600;
       syncBrand();
       if (state.view === "menu") {
         if (y > 140 && y - lastY > 6) $("priceWrap").classList.add("hide");
@@ -1371,6 +1411,7 @@
       }
       lastY = y;
     });
+    $("backTop").addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
     window.addEventListener("hashchange", renderView);
   }
 
