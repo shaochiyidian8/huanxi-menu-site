@@ -442,7 +442,7 @@
   }
   function dishRow(d) {
     var soldout = state.soldout[d.id];
-    var mark = d.uncertain && state.mode === "staff" ? ' <span class="uncertain-mark" title="OCR 转录待核对">?</span>' : "";
+    var mark = d.uncertain && state.mode === "staff" ? ' <span class="uncertain-mark" title="转录待与门店核对">?</span>' : "";
     var orig = d.imgPage
       ? ' <a class="orig-page" data-openpage="' + d.imgPage + '" title="查看原版菜单页">原版 p' + String(d.imgPage).padStart(2, "0") + "</a>" : "";
     return '<div class="dish-row' + (soldout ? " soldout" : "") + '" data-id="' + d.id + '">' +
@@ -538,7 +538,7 @@
         return "◆ " + c.name + "\n" + lines;
       }).join("\n\n");
       return "【" + g[1] + "】\n\n" + secs;
-    }).join("\n\n") + "\n\n—— 以上为 OCR 转录存档，如与门店实物菜单有出入以门店为准 ——";
+    }).join("\n\n") + "\n\n—— 菜单信息如有变动，以门店当日公示为准 ——";
   }
 
   function renderDishes() {
