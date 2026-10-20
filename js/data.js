@@ -6,6 +6,7 @@ var HUANXI_DATA = {
   "slogan": "花月正春风,人间共欢夕",
   "since": "2014",
   "generatedAt": "2026-10-19",
+  "storeId": "huanxi-dayue",
   "sourceNote": "菜品数据由菜单图片 OCR 转录，标注 uncertain 的条目建议与门店核对"
  },
  "store": {

@@ -212,7 +212,8 @@
     $("heroEn").textContent = siteVal("en", D.meta.brandEn);
     $("heroTitle").textContent = siteVal("brand", D.meta.brand);
     $("heroSlogan").textContent = "「" + siteVal("slogan", D.meta.slogan) + "」";
-    $("heroSince").textContent = "Since " + D.meta.since + " · " + D.store.city + D.store.district + D.store.mall + D.store.floor;
+    var locParts = [D.store.city, D.store.district, D.store.mall, D.store.floor].filter(function (v) { return v && v !== "undefined"; });
+    $("heroSince").textContent = "Since " + D.meta.since + (locParts.length ? " · " + locParts.join("") : "");
     loadSiteMedia();
 
     $("locAddr").textContent = siteVal("addr", D.store.address);
@@ -234,8 +235,7 @@
     $("infoGrid").innerHTML = info.map(function (x) {
       return '<div class="info-item"><div class="k">' + x[0] + "</div><div class=\"v\">" + x[1] + "</div></div>";
     }).join("");
-    $("footerMeta").textContent = "菜品数据来源：" + D.meta.brand + "电子菜单 OCR 转录（" + D.meta.generatedAt +
-      "）· 现共 " + DISHES.length + " 项（含店家上新）· " + D.meta.sourceNote;
+    $("footerMeta").textContent = "本单共 " + DISHES.length + " 项 · 时价菜品以门店当日公示为准 · 如有忌口或过敏食材请提前告知店家";
 
     var notice = siteVal("notice", (state.overrides && state.overrides.notice) || "");
     $("noticeBar").hidden = !notice;
@@ -983,8 +983,10 @@
       var now = new Date();
       var o = {
         id: "c" + Date.now(),
+        store: D.meta.storeId || "huanxi-dayue",
         no: String(seq),
         time: String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0"),
+        date: new Date().toISOString().slice(0, 10),
         table: state.table || "未选桌号",
         items: es.map(function (e) { return { name: e.d.name, qty: e.qty, unit: e.unit, price: e.price }; }),
         total: cartTotal(),
@@ -1412,6 +1414,21 @@
       lastY = y;
     });
     $("backTop").addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+    $("myOrdersEntry").addEventListener("click", function () {
+      var list = custOrders().slice().reverse();
+      var stMap = { new: ["new", "待接单"], ok: ["ok", "已接单"], done: ["done", "已完成"] };
+      $("myOrdersList").innerHTML = list.map(function (o) {
+        var st = stMap[o.status] || stMap.new;
+        return '<div class="cust-order"><div class="head"><span class="no">No.' + o.no + "</span>" +
+          "<b>" + o.table + "</b><span>" + (o.date || "") + " " + o.time + "</span>" +
+          '<span class="resv-st ' + st[0] + '">' + st[1] + "</span>" +
+          '<span style="margin-left:auto">¥' + o.total + "</span></div>" +
+          '<div class="items">' + o.items.map(function (it) { return it.name + "×" + it.qty; }).join("、") + "</div></div>";
+      }).join("") || '<p class="cap">本机还没有订单记录。</p>';
+      $("myOrdersModal").hidden = false;
+    });
+    $("myOrdersClose").addEventListener("click", function () { $("myOrdersModal").hidden = true; });
+    $("myOrdersModal").addEventListener("click", function (e) { if (e.target === $("myOrdersModal")) $("myOrdersModal").hidden = true; });
     window.addEventListener("hashchange", renderView);
   }
 

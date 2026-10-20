@@ -120,7 +120,7 @@
   <!-- 预约 -->
   <section class="view" id="view-reserve">
     <div class="page-head"><p class="kicker">RESERVATION</p><h2>预约</h2>
-      <p class="page-sub">提交后店家后台即时收到，也可短信直达</p></div>
+      <p class="page-sub">提交后我们将第一时间与您确认</p></div>
     <div class="inv-card rv">
       <div class="inv-form">
         <label>贵宾称呼 <input id="rvGuest" placeholder="张先生 / 王女士"></label>
@@ -134,7 +134,7 @@
       </div>
       <div class="row-btns">
         <button class="tbtn solid" id="rvSubmit">提交预约</button>
-        <button class="tbtn" id="rvCopy">复制话术文本</button>
+        <button class="tbtn" id="rvCopy">复制预约信息</button>
       </div>
       <div id="rvResult" class="rv-result" hidden></div>
       <textarea id="rvOutput" rows="14" readonly hidden></textarea>
@@ -308,6 +308,7 @@
   <div class="ft-links">
     <a href="#/menu">菜单</a><a href="#/visit">到店</a><a href="#/location">寻址</a>
     <a href="#/reserve">预约</a>
+    <button class="ft-staff" id="myOrdersEntry">我的订单</button>
     <button id="staffEntry" class="ft-staff">店家入口</button>
   </div>
   <div class="ft-brand">欢夕<i>HUANN SIAH HOKKIEN CUISINE</i></div>
@@ -370,6 +371,14 @@
     <img id="payQrImg" class="pay-qr" alt="收款码">
     <p class="cap">长按识别 / 扫码完成后，回到页面点击下方按钮</p>
     <div class="row-btns"><button class="tbtn solid" id="payDone">我已支付</button><button class="tbtn ghost" id="payClose">关闭</button></div>
+  </div>
+</div>
+
+<div class="modal-mask" id="myOrdersModal" hidden>
+  <div class="modal my-orders">
+    <h3>我的订单</h3>
+    <div id="myOrdersList"></div>
+    <div class="row-btns"><button class="tbtn ghost" id="myOrdersClose">关闭</button></div>
   </div>
 </div>
 
