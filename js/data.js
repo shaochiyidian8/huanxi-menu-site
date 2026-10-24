@@ -746,7 +746,7 @@ var HUANXI_DATA = {
    "ingredients": "小青龙、紫蒜",
    "uncertain": false,
    "preorder": false,
-   "img": "",
+   "img": "assets/dishes/m033.jpg",
    "imgPage": 5,
    "specs": null
   },
@@ -761,7 +761,7 @@ var HUANXI_DATA = {
    "ingredients": "小青龙、帕玛森芝士",
    "uncertain": false,
    "preorder": false,
-   "img": "",
+   "img": "assets/dishes/m034.jpg",
    "imgPage": 5,
    "specs": null
   },
@@ -776,7 +776,7 @@ var HUANXI_DATA = {
    "ingredients": "小青龙、鱼丸等(OCR低置信)",
    "uncertain": false,
    "preorder": false,
-   "img": "",
+   "img": "assets/dishes/m035.jpg",
    "imgPage": 5,
    "specs": null
   },
@@ -1023,7 +1023,7 @@ var HUANXI_DATA = {
    "ingredients": "海参、豆腐",
    "uncertain": false,
    "preorder": false,
-   "img": "",
+   "img": "assets/dishes/m050.jpg",
    "imgPage": 7,
    "specs": null
   },
@@ -1251,7 +1251,7 @@ var HUANXI_DATA = {
    "ingredients": "鱼腐、胖丝瓜",
    "uncertain": false,
    "preorder": false,
-   "img": "",
+   "img": "assets/dishes/m064.jpg",
    "imgPage": 9,
    "specs": null
   },
@@ -1582,7 +1582,7 @@ var HUANXI_DATA = {
    "ingredients": "",
    "uncertain": false,
    "preorder": true,
-   "img": "",
+   "img": "assets/dishes/m084.jpg",
    "imgPage": 11,
    "specs": null
   },
@@ -1732,7 +1732,7 @@ var HUANXI_DATA = {
    "ingredients": "",
    "uncertain": false,
    "preorder": true,
-   "img": "",
+   "img": "assets/dishes/m094.jpg",
    "imgPage": 13,
    "specs": null
   },
@@ -1747,7 +1747,7 @@ var HUANXI_DATA = {
    "ingredients": "",
    "uncertain": false,
    "preorder": true,
-   "img": "",
+   "img": "assets/dishes/m095.jpg",
    "imgPage": 13,
    "specs": null
   },
