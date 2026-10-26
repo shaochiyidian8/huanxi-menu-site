@@ -352,8 +352,11 @@
     return src;
   }
   function mediaOf(d) {
+    var custom = state.dishImg[d.id] || null;
+    var imgs = custom ? [custom] : (d.imgs && d.imgs.length ? d.imgs : (d.img ? [d.img] : []));
     return {
-      img: state.dishImg[d.id] || d.img || null,
+      img: imgs[0] || null,
+      imgs: imgs,
       video: state.dishVideo[d.id] || d.video || null
     };
   }
@@ -426,7 +429,8 @@
       ? '<img loading="lazy" src="' + m.img + '" alt="' + d.name + '">'
       : '<div class="thumb-ph" style="--h:' + hueOf(d.id) + '">' + d.name.charAt(0) + "</div>";
     var play = m.video ? '<span class="play-badge">▶</span>' : "";
-    return '<div class="' + cls + '" data-thumb="' + d.id + '">' + inner + play + "</div>";
+    var multi = m.imgs.length > 1 ? '<span class="multi-badge">' + m.imgs.length + '图</span>' : "";
+    return '<div class="' + cls + '" data-thumb="' + d.id + '">' + inner + play + multi + "</div>";
   }
   function badgesHtml(d, compact) {
     var b = d.badges.slice(0, compact ? 1 : 3).map(function (x) { return '<span class="badge ' + x + '">' + x + "</span>"; }).join("");
@@ -927,11 +931,12 @@
           $("dishVideoPlayer").src = m.video;
           $("videoModal").hidden = false;
           $("dishVideoPlayer").play().catch(function () {});
-        } else if (m.img) {
-          state.viewerSingle = true;
-          state.gallery = [m.img];
+        } else if (m.imgs.length) {
+          state.viewerSingle = m.imgs.length === 1;
+          state.gallery = m.imgs;
           state.viewerIdx = 0;
-          $("viewerImg").src = m.img;
+          $("viewerImg").src = m.imgs[0];
+          syncViewerCount();
           $("viewer").hidden = false;
         }
         return;
@@ -1373,9 +1378,24 @@
       if (state.viewerSingle) return;
       state.viewerIdx = (state.viewerIdx + d + state.gallery.length) % state.gallery.length;
       $("viewerImg").src = state.gallery[state.viewerIdx];
+      syncViewerCount();
+    }
+    function syncViewerCount() {
+      var c = $("viewerCount");
+      if (!c) return;
+      if (state.viewerSingle || state.gallery.length <= 1) { c.hidden = true; return; }
+      c.hidden = false;
+      c.textContent = (state.viewerIdx + 1) + " / " + state.gallery.length;
     }
     $("viewerPrev").addEventListener("click", function () { stepViewer(-1); });
     $("viewerNext").addEventListener("click", function () { stepViewer(1); });
+    var tx = null;
+    $("viewer").addEventListener("touchstart", function (e) { tx = e.touches[0].clientX; }, { passive: true });
+    $("viewer").addEventListener("touchend", function (e) {
+      if (tx === null) return;
+      var dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 42) stepViewer(dx < 0 ? 1 : -1);
+    }, { passive: true });
     document.addEventListener("keydown", function (e) {
       if (!$("viewer").hidden) {
         if (e.key === "Escape") closeViewer();

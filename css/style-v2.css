@@ -496,3 +496,14 @@ textarea { width: 100%; resize: vertical; }
   .spec-adds button { padding: 4px 14px; font-size: 13px; }
   .row-thumb { width: 116px; height: 116px; }
 }
+
+/* 多图徽标 */
+.multi-badge {
+  position: absolute; left: 5px; bottom: 5px; background: rgba(10, 12, 6, .78);
+  color: var(--gold-soft); font-size: 10px; letter-spacing: 1px;
+  padding: 1px 7px; border-radius: 999px; pointer-events: none;
+}
+.viewer .viewer-count {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  color: rgba(236, 229, 211, .8); font-size: 12px; letter-spacing: 2px;
+}
