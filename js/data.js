@@ -677,7 +677,7 @@ var HUANXI_DATA = {
    "ingredients": "东星斑约1.2斤、青花椒",
    "uncertain": false,
    "preorder": false,
-   "img": "assets/dishes/m025.jpg",
+   "img": "assets/menu/p04_0.jpg",
    "imgs": [],
    "imgPage": 4,
    "specs": null
@@ -866,7 +866,7 @@ var HUANXI_DATA = {
    "ingredients": "小青龙、鱼丸等",
    "uncertain": false,
    "preorder": false,
-   "img": "assets/dishes/m035.jpg",
+   "img": "assets/menu/p05_0.jpg",
    "imgs": [],
    "imgPage": 5,
    "specs": null
@@ -898,7 +898,7 @@ var HUANXI_DATA = {
    "ingredients": "老虎斑、绣球菌",
    "uncertain": false,
    "preorder": false,
-   "img": "assets/dishes/m037.jpg",
+   "img": "assets/menu/p05_0.jpg",
    "imgs": [],
    "imgPage": 5,
    "specs": null
@@ -1707,7 +1707,7 @@ var HUANXI_DATA = {
    "ingredients": "金线莲、排骨",
    "uncertain": false,
    "preorder": false,
-   "img": "assets/dishes/m080.jpg",
+   "img": "assets/menu/p10_0.jpg",
    "imgs": [],
    "imgPage": 10,
    "specs": null
@@ -1723,7 +1723,7 @@ var HUANXI_DATA = {
    "ingredients": "瘦肉片、沙螺",
    "uncertain": false,
    "preorder": false,
-   "img": "assets/dishes/m081.jpg",
+   "img": "assets/menu/p10_0.jpg",
    "imgs": [],
    "imgPage": 10,
    "specs": null
